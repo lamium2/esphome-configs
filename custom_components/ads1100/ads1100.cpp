@@ -6,10 +6,6 @@ namespace esphome {
 namespace ads1100 {
 
 static const char *const TAG = "ads1100";
-static const uint8_t ADS1100_REGISTER_CONVERSION = 0x00;
-static const uint8_t ADS1100_REGISTER_CONFIG = 0x01;
-
-static const uint8_t ADS1100_DATA_RATE_860_SPS = 0b111;
 
 void ADS1100Component::setup() {
   ESP_LOGCONFIG(TAG, "Setting up ADS1100...");
@@ -20,24 +16,21 @@ void ADS1100Component::setup() {
   }
   uint16_t config = 0;
   // Clear single-shot bit
-  //        0b0xxxxxxxxxxxxxxx
-  config |= 0b0000000000000000;
-  // Setup multiplexer
-  //        0bx000xxxxxxxxxxxx
-  config |= ADS1100_MULTIPLEXER_8 << 12;
+  //        0bxxx0xxxx
+  config |= 0b00000000;
 
   // Setup Gain
-  //        0bxxxx000xxxxxxxxx
+  //        0bxxxxxx00
   config |= ADS1100_GAIN_6P144 << 9;
 
   if (this->continuous_mode_) {
     // Set continuous mode
-    //        0bxxxxxxx0xxxxxxxx
-    config |= 0b0000000000000000;
+    //        0b00000000
+    config |= 0b00000000;
   } else {
     // Set singleshot mode
     //        0bxxxxxxx1xxxxxxxx
-    config |= 0b0000000100000000;
+    config |= 0b00010000;
   }
 
   // Set data rate - 860 samples per second (we're in singleshot mode)
@@ -131,23 +124,17 @@ float ADS1100Component::request_measurement(ADS1100Sensor *sensor) {
 
   float millivolts;
   switch (sensor->get_gain()) {
-    case ADS1100_GAIN_6P144:
-      millivolts = signed_conversion * 0.187500f;
+    case ADS1100_GAIN_1:
+      millivolts = signed_conversion * 5.859375f;
       break;
-    case ADS1100_GAIN_4P096:
-      millivolts = signed_conversion * 0.125000f;
+    case ADS1100_GAIN_2:
+      millivolts = signed_conversion * 2.9296875f;
       break;
-    case ADS1100_GAIN_2P048:
-      millivolts = signed_conversion * 0.062500f;
+    case ADS1100_GAIN_4:
+      millivolts = signed_conversion * 1.46484375f;
       break;
-    case ADS1100_GAIN_1P024:
-      millivolts = signed_conversion * 0.031250f;
-      break;
-    case ADS1100_GAIN_0P512:
-      millivolts = signed_conversion * 0.015625f;
-      break;
-    case ADS1100_GAIN_0P256:
-      millivolts = signed_conversion * 0.007813f;
+    case ADS1100_GAIN_8:
+      millivolts = signed_conversion * 0.732421875f;
       break;
     default:
       millivolts = NAN;
