@@ -27,10 +27,10 @@ enum ADS1100Rate {
 };
 
 enum ADS1100Gain {
-  ADS1100_GAIN_1  = 0x01,
-  ADS1100_GAIN_2  = 0x02,
-  ADS1100_GAIN_4  = 0x03,
-  ADS1100_GAIN_8  = 0x04,
+  ADS1100_GAIN_1  = 0x00,
+  ADS1100_GAIN_2  = 0x01,
+  ADS1100_GAIN_4  = 0x02,
+  ADS1100_GAIN_8  = 0x03,
 };
 
 class ADS1100Sensor;
