@@ -3,7 +3,6 @@ import esphome.config_validation as cv
 from esphome.components import sensor, voltage_sampler
 from esphome.const import (
     CONF_GAIN,
-    CONF_MULTIPLEXER,
     DEVICE_CLASS_VOLTAGE,
     STATE_CLASS_MEASUREMENT,
     UNIT_VOLT,
@@ -13,26 +12,12 @@ from . import ads1100_ns, ADS1100Component
 
 DEPENDENCIES = ["ads1100"]
 
-ADS1100Multiplexer = ads1100_ns.enum("ADS1100Multiplexer")
-MUX = {
-    "A0_A1": ADS1100Multiplexer.ADS1100_MULTIPLEXER_P0_N1,
-    "A0_A3": ADS1100Multiplexer.ADS1100_MULTIPLEXER_P0_N3,
-    "A1_A3": ADS1100Multiplexer.ADS1100_MULTIPLEXER_P1_N3,
-    "A2_A3": ADS1100Multiplexer.ADS1100_MULTIPLEXER_P2_N3,
-    "A0_GND": ADS1100Multiplexer.ADS1100_MULTIPLEXER_P0_NG,
-    "A1_GND": ADS1100Multiplexer.ADS1100_MULTIPLEXER_P1_NG,
-    "A2_GND": ADS1100Multiplexer.ADS1100_MULTIPLEXER_P2_NG,
-    "A3_GND": ADS1100Multiplexer.ADS1100_MULTIPLEXER_P3_NG,
-}
-
 ADS1100Gain = ads1100_ns.enum("ADS1100Gain")
 GAIN = {
-    "6.144": ADS1100Gain.ADS1100_GAIN_6P144,
-    "4.096": ADS1100Gain.ADS1100_GAIN_4P096,
-    "2.048": ADS1100Gain.ADS1100_GAIN_2P048,
-    "1.024": ADS1100Gain.ADS1100_GAIN_1P024,
-    "0.512": ADS1100Gain.ADS1100_GAIN_0P512,
-    "0.256": ADS1100Gain.ADS1100_GAIN_0P256,
+    "1": ADS1100Gain.ADS1100_GAIN_1,
+    "2": ADS1100Gain.ADS1100_GAIN_2,
+    "4": ADS1100Gain.ADS1100_GAIN_4,
+    "8": ADS1100Gain.ADS1100_GAIN_8,
 }
 
 
@@ -61,7 +46,6 @@ CONFIG_SCHEMA = (
         {
             cv.GenerateID(): cv.declare_id(ADS1100Sensor),
             cv.GenerateID(CONF_ADS1100_ID): cv.use_id(ADS1100Component),
-            cv.Required(CONF_MULTIPLEXER): cv.enum(MUX, upper=True, space="_"),
             cv.Required(CONF_GAIN): validate_gain,
         }
     )
@@ -75,7 +59,6 @@ async def to_code(config):
     await sensor.register_sensor(var, config)
     await cg.register_component(var, config)
 
-    cg.add(var.set_multiplexer(config[CONF_MULTIPLEXER]))
     cg.add(var.set_gain(config[CONF_GAIN]))
 
     cg.add(paren.register_sensor(var))
